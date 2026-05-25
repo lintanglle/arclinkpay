@@ -6,9 +6,21 @@ Live demo: [https://arclinkpay.vercel.app](https://arclinkpay.vercel.app)
 
 ## What ArcLinkPay Is
 
-ArcLinkPay is a simple USDC payment link platform built for Arc. It helps users create payment requests, share a link with a payer, receive USDC, and track payment status with a clear receipt.
+ArcLinkPay is a simple USDC payment link platform built for Arc. It is designed to help users create payment requests, share a link with a payer, receive USDC, and track payment status with a clear receipt.
 
-The current version is an integration-ready MVP foundation. It includes wallet connection UI, API routes, a database-ready payment link model, and mock fallback storage. The payment action is still simulated and does not execute real USDC transfers.
+The current version is an integration-ready MVP foundation. It includes wallet connection UI, payment link API routes, a database-ready payment link model, and mock fallback storage. The payment flow is still simulated and does not execute real USDC transfers.
+
+## Current Milestone
+
+ArcLinkPay is no longer only a static frontend mock. This milestone adds the foundation needed for future production integrations:
+
+- Wallet connection UI and EVM wallet foundation
+- Payment link create, read, list, and status update API routes
+- Database-ready payment link data model
+- Supabase-ready structure with mock fallback when env vars are missing
+- Simulated payment flow for demo and testing
+
+Real USDC transfer execution is not live yet. Real Arc onchain settlement is planned for the next milestone.
 
 ## Problem
 
@@ -28,7 +40,7 @@ A recipient can create a request with a title, amount, recipient wallet address,
 - Create payment link page backed by the API foundation
 - Public payment page at `/pay/[id]`
 - Wallet connection foundation using a common EVM wallet stack
-- Simulated "Pay with USDC" flow
+- Simulated payment flow for demo purposes
 - Receipt page at `/receipt/[id]`
 - Dashboard loaded through the payment link API foundation
 - Database-ready payment link model for future persistence
@@ -44,7 +56,7 @@ A recipient can create a request with a title, amount, recipient wallet address,
 4. Generate the mock payment link.
 5. Open the public payment page.
 6. Connect an EVM wallet.
-7. Click **Simulate USDC payment** to mark the request as paid.
+7. Click **Simulate USDC payment** to mark the request as paid in the app state.
 8. View the receipt page.
 9. Open the dashboard to review payment links and statuses.
 
@@ -52,13 +64,13 @@ A recipient can create a request with a title, amount, recipient wallet address,
 
 ArcLinkPay is designed around Arc as the target payment network. The MVP UI already presents Arc as the payment network on payment and receipt screens so the user flow is clear before protocol integration.
 
-This milestone adds the wallet and payment execution abstraction needed for a future Arc integration. The real Arc USDC transfer logic is intentionally left as a TODO in the payment execution layer.
+This milestone adds the wallet and payment execution abstraction needed for a future Arc integration. Real Arc onchain settlement is planned next, and the real USDC transfer logic is intentionally left as a TODO in the payment execution layer.
 
 ## How USDC Is Used
 
 USDC is the payment asset for ArcLinkPay requests. The MVP uses USDC-denominated payment requests and simulated transaction hashes to demonstrate the request, payment, dashboard, and receipt experience.
 
-Real USDC transfers are not enabled yet.
+Real USDC transfers are not enabled yet. The current payment flow updates simulated status only.
 
 ## Target Users
 
@@ -87,7 +99,7 @@ Real USDC transfers are not enabled yet.
 - Wallet connection foundation for payers and recipients
 - API route foundation for create, read, list, and status updates
 - Supabase-ready payment link model
-- Onchain USDC payment execution on Arc
+- Real Arc onchain USDC settlement
 - Transaction status detection
 - Real receipt generation from transaction data
 - Payment link persistence
@@ -98,11 +110,11 @@ Real USDC transfers are not enabled yet.
 
 ArcLinkPay is currently an integration-ready MVP foundation.
 
-The app is ready to demonstrate the product direction, core screens, wallet connection foundation, API structure, database-ready model, and simulated payment journey. It does not yet perform onchain USDC settlement.
+The app is ready to demonstrate the product direction, core screens, wallet connection foundation, API structure, database-ready model, and simulated payment journey. It does not yet perform real USDC transfer execution or onchain Arc settlement.
 
 ## Disclaimer
 
-This project does not currently process real payments. The wallet connection UI is present as an integration foundation, but payment execution remains simulated. Production wallet-based USDC transfer execution and onchain Arc settlement will be added in a later milestone.
+This project does not currently process real payments. The wallet connection UI is present as an integration foundation, but payment execution remains simulated. Production wallet-based USDC transfer execution and onchain Arc settlement are planned for the next milestone.
 
 ## Environment Variables
 
