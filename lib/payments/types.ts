@@ -5,7 +5,7 @@ export type PaymentLink = {
   title: string;
   amount: string;
   asset: "USDC";
-  network: "Arc";
+  network: "Arc Testnet";
   recipientAddress: string;
   payerAddress?: string;
   note?: string;

@@ -68,11 +68,13 @@ ArcLinkPay is designed around Arc as the target payment network. The MVP UI alre
 
 This milestone adds the wallet and payment execution abstraction needed for a future Arc integration. Real Arc onchain settlement is planned next, and the real USDC transfer logic is intentionally left as a TODO in the payment execution layer.
 
-The prepared onchain layer includes Arc chain ID, RPC URL, USDC token address, and block explorer placeholders. It also includes an ERC20 `transfer` ABI helper, a payment executor interface, and a transaction status checker interface. The app still uses simulated payment execution by default.
+The prepared onchain layer now targets Arc Testnet configuration: chain ID `5042002`, RPC `https://rpc.testnet.arc.network`, WebSocket `wss://rpc.testnet.arc.network`, block explorer `https://testnet.arcscan.app`, faucet `https://faucet.circle.com`, and USDC ERC-20 interface address `0x3600000000000000000000000000000000000000`.
+
+Arc uses USDC as the native gas token. For app-level USDC balance reads and payment transfers, ArcLinkPay is prepared to use the USDC ERC-20 interface with 6 decimals. The app still uses simulated payment execution by default.
 
 ## How USDC Is Used
 
-USDC is the payment asset for ArcLinkPay requests. The MVP uses USDC-denominated payment requests and simulated transaction hashes to demonstrate the request, payment, dashboard, and receipt experience.
+USDC is the payment asset for ArcLinkPay requests. On Arc Testnet, USDC is also the native gas token, while the configured ERC-20 interface address is prepared for app-level balance reads and payment transfers. The MVP uses USDC-denominated payment requests and simulated transaction hashes to demonstrate the request, payment, dashboard, and receipt experience.
 
 Real USDC transfers are not enabled yet. The current payment flow updates simulated status only.
 
@@ -134,13 +136,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-Future Arc network configuration can use:
+Arc Testnet network configuration defaults:
 
 ```bash
-NEXT_PUBLIC_ARC_CHAIN_ID=504
-NEXT_PUBLIC_ARC_RPC_URL=
-NEXT_PUBLIC_ARC_USDC_TOKEN_ADDRESS=
-NEXT_PUBLIC_ARC_BLOCK_EXPLORER_URL=
+NEXT_PUBLIC_ARC_CHAIN_ID=5042002
+NEXT_PUBLIC_ARC_RPC_URL=https://rpc.testnet.arc.network
+NEXT_PUBLIC_ARC_WS_URL=wss://rpc.testnet.arc.network
+NEXT_PUBLIC_ARC_USDC_TOKEN_ADDRESS=0x3600000000000000000000000000000000000000
+NEXT_PUBLIC_ARC_BLOCK_EXPLORER_URL=https://testnet.arcscan.app
+NEXT_PUBLIC_ARC_FAUCET_URL=https://faucet.circle.com
 ```
 
 ## Local Development

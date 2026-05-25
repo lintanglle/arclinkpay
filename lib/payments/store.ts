@@ -32,7 +32,7 @@ export async function createPaymentLink(input: CreatePaymentLinkInput) {
     title: input.title,
     amount: input.amount,
     asset: "USDC",
-    network: "Arc",
+    network: "Arc Testnet",
     recipientAddress: input.recipientAddress,
     note: input.note,
     status: "unpaid",

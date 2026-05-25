@@ -1,5 +1,6 @@
 import type { Address } from "viem";
 import { parseUnits } from "viem";
+import { ARC_USDC_DECIMALS } from "./config";
 
 export const erc20TransferAbi = [
   {
@@ -17,7 +18,7 @@ export const erc20TransferAbi = [
 export function prepareErc20TransferArgs({
   recipientAddress,
   amount,
-  decimals = 6,
+  decimals = ARC_USDC_DECIMALS,
 }: {
   recipientAddress: Address;
   amount: string;

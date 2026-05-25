@@ -9,13 +9,14 @@ export const arcPlaceholderChain = defineChain({
   id: arcPaymentConfig.chainId,
   name: "Arc",
   nativeCurrency: {
-    decimals: 18,
-    name: "Arc Gas Token",
-    symbol: "ARC",
+    decimals: arcPaymentConfig.usdcDecimals,
+    name: "USDC",
+    symbol: arcPaymentConfig.nativeCurrencySymbol,
   },
   rpcUrls: {
     default: {
       http: [arcPaymentConfig.rpcUrl],
+      webSocket: [arcPaymentConfig.webSocketUrl],
     },
   },
   blockExplorers: {
