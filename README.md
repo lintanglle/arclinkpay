@@ -18,6 +18,7 @@ ArcLinkPay is no longer only a static frontend mock. This milestone adds the fou
 - Payment link create, read, list, and status update API routes
 - Database-ready payment link data model
 - Supabase-ready client/server structure with mock fallback when env vars are missing
+- Prepared Arc USDC payment execution layer with config placeholders, ERC20 transfer ABI helper, executor interface, and transaction status checker interface
 - Simulated payment flow for demo and testing
 
 Real USDC transfer execution is not live yet. Real Arc onchain settlement is planned for the next milestone.
@@ -45,6 +46,7 @@ A recipient can create a request with a title, amount, recipient wallet address,
 - Dashboard loaded through the payment link API foundation
 - Database-ready payment link model for future persistence
 - Supabase-ready client/server setup with mock fallback when env vars are missing
+- Arc USDC execution preparation layer for future wallet transactions
 - Dark-mode friendly, responsive UI
 - Safe fallback UI for unknown payment and receipt IDs
 
@@ -65,6 +67,8 @@ A recipient can create a request with a title, amount, recipient wallet address,
 ArcLinkPay is designed around Arc as the target payment network. The MVP UI already presents Arc as the payment network on payment and receipt screens so the user flow is clear before protocol integration.
 
 This milestone adds the wallet and payment execution abstraction needed for a future Arc integration. Real Arc onchain settlement is planned next, and the real USDC transfer logic is intentionally left as a TODO in the payment execution layer.
+
+The prepared onchain layer includes Arc chain ID, RPC URL, USDC token address, and block explorer placeholders. It also includes an ERC20 `transfer` ABI helper, a payment executor interface, and a transaction status checker interface. The app still uses simulated payment execution by default.
 
 ## How USDC Is Used
 
@@ -100,6 +104,7 @@ Real USDC transfers are not enabled yet. The current payment flow updates simula
 - API route foundation for create, read, list, and status updates
 - Supabase-ready payment link model
 - Replace in-memory fallback with Supabase persistence when credentials are configured
+- Replace simulated payment executor with real Arc USDC wallet transaction calls
 - Real Arc onchain USDC settlement
 - Transaction status detection
 - Real receipt generation from transaction data
@@ -135,6 +140,7 @@ Future Arc network configuration can use:
 NEXT_PUBLIC_ARC_CHAIN_ID=504
 NEXT_PUBLIC_ARC_RPC_URL=
 NEXT_PUBLIC_ARC_USDC_TOKEN_ADDRESS=
+NEXT_PUBLIC_ARC_BLOCK_EXPLORER_URL=
 ```
 
 ## Local Development

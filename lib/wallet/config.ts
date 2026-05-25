@@ -3,12 +3,10 @@
 import { QueryClient } from "@tanstack/react-query";
 import { defineChain, http } from "viem";
 import { createConfig, injected } from "wagmi";
-
-const arcChainId = Number(process.env.NEXT_PUBLIC_ARC_CHAIN_ID ?? 504);
-const arcRpcUrl = process.env.NEXT_PUBLIC_ARC_RPC_URL;
+import { arcPaymentConfig } from "@/lib/arc/config";
 
 export const arcPlaceholderChain = defineChain({
-  id: Number.isFinite(arcChainId) ? arcChainId : 504,
+  id: arcPaymentConfig.chainId,
   name: "Arc",
   nativeCurrency: {
     decimals: 18,
@@ -17,7 +15,13 @@ export const arcPlaceholderChain = defineChain({
   },
   rpcUrls: {
     default: {
-      http: [arcRpcUrl || "https://example.invalid/rpc"],
+      http: [arcPaymentConfig.rpcUrl],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Arc Explorer",
+      url: arcPaymentConfig.blockExplorerUrl,
     },
   },
 });
@@ -30,7 +34,7 @@ export const wagmiConfig = createConfig({
     }),
   ],
   transports: {
-    [arcPlaceholderChain.id]: http(arcRpcUrl),
+    [arcPlaceholderChain.id]: http(arcPaymentConfig.rpcUrl),
   },
   ssr: true,
 });
