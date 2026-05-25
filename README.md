@@ -92,7 +92,7 @@ The app is ready to demonstrate the product direction, core screens, and user jo
 
 ## Disclaimer
 
-This project does not currently process real payments. Wallet connection, real Arc transactions, and onchain USDC settlement will be added in a later milestone.
+This project does not currently process real payments. Real wallet connection and onchain USDC settlement will be added in a later milestone.
 
 ## Local Development
 
