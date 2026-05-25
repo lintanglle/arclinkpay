@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AppShell, Badge, Card, secondaryButton } from "../../components/app-shell";
-import { formatDate, shortenAddress } from "@/lib/payments/format";
+import { formatPaymentDate, shortenAddress } from "@/lib/payments/format";
 import type { DataMode, PaymentLink } from "@/lib/payments/types";
 
 type PaymentPayload = {
@@ -93,8 +93,13 @@ export function ReceiptView({ id }: { id: string }) {
     ["Payer address", shortenAddress(payment.payerAddress)],
     ["Recipient address", shortenAddress(payment.recipientAddress)],
     ["Transaction hash", payment.txHash || "Not available yet"],
-    ["Created", formatDate(payment.createdAt)],
-    ["Paid", payment.paidAt ? formatDate(payment.paidAt) : "Not paid yet"],
+    ["Created", formatPaymentDate(payment.createdAt, payment.createdAtLabel)],
+    [
+      "Paid",
+      payment.paidAt
+        ? formatPaymentDate(payment.paidAt, payment.paidAtLabel)
+        : "Not paid yet",
+    ],
   ];
 
   return (

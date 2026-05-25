@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Badge, Card } from "../components/app-shell";
-import { formatDate, shortenAddress } from "@/lib/payments/format";
+import { formatPaymentDate, shortenAddress } from "@/lib/payments/format";
 import type { DataMode, PaymentLink } from "@/lib/payments/types";
 
 type DashboardPayload = {
@@ -80,6 +80,11 @@ export function DashboardLinks({
           <span className="text-slate-500 dark:text-slate-400">Refreshing...</span>
         ) : null}
       </div>
+      {data.dataMode === "mock-fallback" ? (
+        <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100">
+          Demo data shown because no database is configured.
+        </p>
+      ) : null}
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
@@ -153,7 +158,7 @@ export function DashboardLinks({
                       {shortenAddress(payment.recipientAddress)}
                     </td>
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
-                      {formatDate(payment.createdAt)}
+                      {formatPaymentDate(payment.createdAt, payment.createdAtLabel)}
                     </td>
                     <td className="px-6 py-4">
                       <Link
@@ -179,7 +184,7 @@ export function DashboardLinks({
                       {payment.title}
                     </p>
                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                      {formatDate(payment.createdAt)}
+                      {formatPaymentDate(payment.createdAt, payment.createdAtLabel)}
                     </p>
                   </div>
                   <Badge tone={payment.status === "paid" ? "success" : "warning"}>

@@ -12,7 +12,9 @@ export type PaymentLink = {
   status: PaymentStatus;
   txHash?: string;
   createdAt: string;
+  createdAtLabel?: string;
   paidAt?: string;
+  paidAtLabel?: string;
   expiresAt?: string;
 };
 

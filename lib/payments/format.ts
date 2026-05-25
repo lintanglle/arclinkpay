@@ -9,6 +9,10 @@ export function formatDate(value?: string) {
   }).format(new Date(value));
 }
 
+export function formatPaymentDate(value?: string, label?: string) {
+  return label || formatDate(value);
+}
+
 export function shortenAddress(address?: string) {
   if (!address) {
     return "Not connected";
