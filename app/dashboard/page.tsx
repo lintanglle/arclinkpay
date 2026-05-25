@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { AppShell, primaryButton } from "../components/app-shell";
-import { getDataMode, listPaymentLinks } from "@/lib/payments/store";
 import { DashboardLinks } from "./dashboard-links";
 
-export default async function DashboardPage() {
-  const payments = await listPaymentLinks();
-
+export default function DashboardPage() {
   return (
     <AppShell>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
@@ -26,12 +23,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <DashboardLinks
-        initialData={{
-          dataMode: getDataMode(),
-          payments,
-        }}
-      />
+      <DashboardLinks />
     </AppShell>
   );
 }

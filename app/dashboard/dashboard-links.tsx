@@ -12,9 +12,12 @@ type DashboardPayload = {
 };
 
 export function DashboardLinks({
-  initialData,
+  initialData = {
+    dataMode: "mock-fallback",
+    payments: [],
+  },
 }: {
-  initialData: DashboardPayload;
+  initialData?: DashboardPayload;
 }) {
   const [data, setData] = useState(initialData);
   const [isLoading, setIsLoading] = useState(false);

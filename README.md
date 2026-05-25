@@ -17,7 +17,7 @@ ArcLinkPay is no longer only a static frontend mock. This milestone adds the fou
 - Wallet connection UI and EVM wallet foundation
 - Payment link create, read, list, and status update API routes
 - Database-ready payment link data model
-- Supabase-ready structure with mock fallback when env vars are missing
+- Supabase-ready client/server structure with mock fallback when env vars are missing
 - Simulated payment flow for demo and testing
 
 Real USDC transfer execution is not live yet. Real Arc onchain settlement is planned for the next milestone.
@@ -44,7 +44,7 @@ A recipient can create a request with a title, amount, recipient wallet address,
 - Receipt page at `/receipt/[id]`
 - Dashboard loaded through the payment link API foundation
 - Database-ready payment link model for future persistence
-- Supabase-ready setup with mock fallback when env vars are missing
+- Supabase-ready client/server setup with mock fallback when env vars are missing
 - Dark-mode friendly, responsive UI
 - Safe fallback UI for unknown payment and receipt IDs
 
@@ -99,6 +99,7 @@ Real USDC transfers are not enabled yet. The current payment flow updates simula
 - Wallet connection foundation for payers and recipients
 - API route foundation for create, read, list, and status updates
 - Supabase-ready payment link model
+- Replace in-memory fallback with Supabase persistence when credentials are configured
 - Real Arc onchain USDC settlement
 - Transaction status detection
 - Real receipt generation from transaction data
@@ -110,7 +111,7 @@ Real USDC transfers are not enabled yet. The current payment flow updates simula
 
 ArcLinkPay is currently an integration-ready MVP foundation.
 
-The app is ready to demonstrate the product direction, core screens, wallet connection foundation, API structure, database-ready model, and simulated payment journey. It does not yet perform real USDC transfer execution or onchain Arc settlement.
+The app is ready to demonstrate the product direction, core screens, wallet connection foundation, payment link API/data foundation, Supabase-ready structure, and simulated payment journey. It does not yet perform real USDC transfer execution or onchain Arc settlement.
 
 ## Disclaimer
 
