@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WalletButton } from "./wallet-button";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -29,6 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
+          <WalletButton compact />
         </div>
       </header>
       <main className="relative mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:py-14">
@@ -87,3 +89,22 @@ export const secondaryButton =
 
 export const fieldClass =
   "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:shadow-none dark:hover:border-white/20";
+
+export function WalletRequiredPanel({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-400/20 dark:bg-blue-400/10">
+      <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+        Wallet connection required
+      </p>
+      <p className="mt-2 text-sm leading-6 text-blue-800 dark:text-blue-100/80">
+        Connect an EVM wallet to use the simulated payment action. This still
+        does not execute a real USDC transfer.
+      </p>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}

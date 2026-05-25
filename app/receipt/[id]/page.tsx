@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppShell, Badge, Card, secondaryButton } from "../../components/app-shell";
-import { getPaymentLink } from "@/lib/mock-payments";
+import { formatDate, shortenAddress } from "@/lib/payments/format";
+import { getPaymentLink } from "@/lib/payments/store";
 
 export default async function ReceiptPage({
   params,
@@ -8,7 +9,7 @@ export default async function ReceiptPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const payment = getPaymentLink(id);
+  const payment = await getPaymentLink(id);
 
   if (!payment) {
     return (
@@ -20,7 +21,7 @@ export default async function ReceiptPage({
                 Receipt unavailable
               </p>
               <h1 className="text-3xl font-semibold tracking-normal text-slate-950 dark:text-white">
-                This mock receipt was not found
+                This receipt was not found
               </h1>
               <p className="mx-auto max-w-md leading-7 text-slate-600 dark:text-slate-300">
                 Open the demo receipt or return to the dashboard to view the
@@ -42,12 +43,13 @@ export default async function ReceiptPage({
   }
 
   const rows = [
-    ["Amount", `${payment.amount} USDC`],
-    ["Network", "Arc"],
-    ["Payer address", payment.payer],
-    ["Recipient address", payment.recipient],
-    ["Transaction hash", payment.txHash],
-    ["Timestamp", payment.timestamp],
+    ["Amount", `${payment.amount} ${payment.asset}`],
+    ["Network", payment.network],
+    ["Payer address", shortenAddress(payment.payerAddress)],
+    ["Recipient address", shortenAddress(payment.recipientAddress)],
+    ["Transaction hash", payment.txHash || "Not available yet"],
+    ["Created", formatDate(payment.createdAt)],
+    ["Paid", payment.paidAt ? formatDate(payment.paidAt) : "Not paid yet"],
   ];
 
   return (
@@ -56,18 +58,24 @@ export default async function ReceiptPage({
         <Card>
           <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 dark:border-white/10 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <Badge tone="success">Paid receipt</Badge>
+              <Badge tone={payment.status === "paid" ? "success" : "warning"}>
+                {payment.status === "paid" ? "Paid receipt" : "Receipt pending"}
+              </Badge>
               <h1 className="mt-4 text-2xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-3xl">
                 {payment.title}
               </h1>
               <p className="mt-2 text-slate-600 dark:text-slate-300">
-                Payment completed in USDC on Arc.
+                {payment.status === "paid"
+                  ? "Simulated payment completed in USDC on Arc."
+                  : "Payment has not been simulated yet."}
               </p>
             </div>
             <div className="sm:text-right">
-              <p className="text-sm text-slate-500 dark:text-slate-400">Paid</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Status
+              </p>
               <p className="mt-1 text-2xl font-semibold text-slate-950 dark:text-white sm:text-3xl">
-                {payment.amount} USDC
+                {payment.status}
               </p>
             </div>
           </div>

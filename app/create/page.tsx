@@ -1,13 +1,8 @@
 import { AppShell, Card } from "../components/app-shell";
 import { CreatePaymentForm } from "./create-payment-form";
+import { getDataMode } from "@/lib/payments/store";
 
-export default async function CreatePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ generated?: string }>;
-}) {
-  const { generated } = await searchParams;
-
+export default function CreatePage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl">
@@ -20,13 +15,12 @@ export default async function CreatePage({
           </h1>
           <p className="text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg sm:leading-8">
             Enter the payment details a payer should see before sending USDC on
-            Arc. This demo generates a mock link only.
+            Arc. This creates a payment link through the API foundation while
+            settlement remains simulated.
           </p>
         </div>
         <Card>
-          <CreatePaymentForm
-            generatedLink={generated ? "/pay/demo-payment" : undefined}
-          />
+          <CreatePaymentForm dataMode={getDataMode()} />
         </Card>
       </div>
     </AppShell>
