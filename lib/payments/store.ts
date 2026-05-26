@@ -36,6 +36,7 @@ export async function createPaymentLink(input: CreatePaymentLinkInput) {
     recipientAddress: input.recipientAddress,
     note: input.note,
     status: "unpaid",
+    executionMode: "simulated",
     createdAt: new Date().toISOString(),
     expiresAt: input.expiresAt || undefined,
   };
@@ -57,6 +58,7 @@ export async function updatePaymentStatus(
   const updated: PaymentLink = {
     ...payment,
     status: input.status,
+    executionMode: input.executionMode ?? payment.executionMode,
     payerAddress: input.payerAddress ?? payment.payerAddress,
     txHash: input.txHash ?? payment.txHash,
     paidAt: input.paidAt ?? payment.paidAt,

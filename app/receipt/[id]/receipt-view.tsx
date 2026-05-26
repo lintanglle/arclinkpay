@@ -87,12 +87,17 @@ export function ReceiptView({ id }: { id: string }) {
   }
 
   const payment = payload.payment;
+  const isArcTestnetReceipt = payment.executionMode === "arc-testnet";
+  const arcScanTxUrl =
+    isArcTestnetReceipt && payment.txHash
+      ? `https://testnet.arcscan.app/tx/${payment.txHash}`
+      : undefined;
   const rows = [
     ["Amount", `${payment.amount} ${payment.asset}`],
     ["Network", payment.network],
+    ["Receipt type", isArcTestnetReceipt ? "Arc Testnet receipt" : "Simulated receipt"],
     ["Payer address", shortenAddress(payment.payerAddress)],
     ["Recipient address", shortenAddress(payment.recipientAddress)],
-    ["Transaction hash", payment.txHash || "Not available yet"],
     ["Created", formatPaymentDate(payment.createdAt, payment.createdAtLabel)],
     [
       "Paid",
@@ -112,11 +117,16 @@ export function ReceiptView({ id }: { id: string }) {
                 {payment.status === "paid" ? "Paid receipt" : "Receipt pending"}
               </Badge>
               <h1 className="mt-4 text-2xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-3xl">
-                {payment.title}
+                {isArcTestnetReceipt ? "Arc Testnet receipt" : "Simulated receipt"}
               </h1>
+              <p className="mt-1 font-medium text-slate-950 dark:text-white">
+                {payment.title}
+              </p>
               <p className="mt-2 text-slate-600 dark:text-slate-300">
                 {payment.status === "paid"
-                  ? "Simulated payment completed in USDC on Arc."
+                  ? isArcTestnetReceipt
+                    ? "USDC payment confirmed on Arc Testnet."
+                    : "Demo payment completed without an onchain transfer."
                   : "Payment has not been simulated yet."}
               </p>
             </div>
@@ -142,6 +152,28 @@ export function ReceiptView({ id }: { id: string }) {
                 </span>
               </div>
             ))}
+          </div>
+
+          <div className="mt-3 rounded-lg bg-slate-50 px-4 py-3 text-sm dark:bg-white/5">
+            <p className="text-slate-500 dark:text-slate-400">
+              Transaction hash
+            </p>
+            {arcScanTxUrl ? (
+              <a
+                href={arcScanTxUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 block break-all font-mono font-medium text-blue-700 underline underline-offset-4 dark:text-blue-300"
+              >
+                {payment.txHash}
+              </a>
+            ) : (
+              <p className="mt-2 break-all font-medium text-slate-950 dark:text-white">
+                {payment.txHash
+                  ? `${payment.txHash} (simulated, not onchain)`
+                  : "Not available yet"}
+              </p>
+            )}
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">

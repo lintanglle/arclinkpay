@@ -60,7 +60,7 @@ A recipient can create a request with a title, amount, recipient wallet address,
 5. Open the public payment page.
 6. Connect an EVM wallet.
 7. Use the default simulated mode for a safe demo, or switch to **Real Arc Testnet** when your wallet is connected to Arc Testnet.
-8. For real testnet mode, submit the USDC ERC-20 transfer and wait for confirmation.
+8. For real testnet mode, make sure the payer wallet has Arc Testnet USDC from the faucet, then submit the USDC ERC-20 transfer and wait for confirmation.
 9. View the receipt page.
 10. Open the dashboard to review payment links and statuses.
 
@@ -72,13 +72,13 @@ This milestone adds wallet-based Arc Testnet payment execution while keeping sim
 
 The onchain layer targets Arc Testnet configuration: chain ID `5042002`, RPC `https://rpc.testnet.arc.network`, WebSocket `wss://rpc.testnet.arc.network`, block explorer `https://testnet.arcscan.app`, faucet `https://faucet.circle.com`, and USDC ERC-20 interface address `0x3600000000000000000000000000000000000000`.
 
-Arc uses USDC as the native gas token. For app-level USDC balance reads and payment transfers, ArcLinkPay uses the USDC ERC-20 interface with 6 decimals. The app still uses simulated payment execution by default unless the payer explicitly selects real Arc Testnet mode.
+Arc uses USDC as the native gas token. For app-level USDC balance reads and payment transfers, ArcLinkPay uses the USDC ERC-20 interface with 6 decimals. The app still uses simulated payment execution by default unless the payer explicitly selects real Arc Testnet mode. Real testnet transaction hashes link to ArcScan for verification.
 
 ## How USDC Is Used
 
 USDC is the payment asset for ArcLinkPay requests. On Arc Testnet, USDC is also the native gas token, while the configured ERC-20 interface address is used for app-level payment transfers. The MVP supports both simulated payments and opt-in real Arc Testnet USDC transfers.
 
-Production or mainnet USDC transfers are not enabled yet.
+Production or mainnet USDC transfers are not enabled yet. To test real Arc Testnet payments, users need Arc Testnet USDC from [Circle's faucet](https://faucet.circle.com).
 
 ## Target Users
 

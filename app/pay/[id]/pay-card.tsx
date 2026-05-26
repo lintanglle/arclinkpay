@@ -29,6 +29,12 @@ import {
 import { WalletButton } from "../../components/wallet-button";
 
 type PaymentMode = "simulated" | "real";
+type EthereumProvider = {
+  request: (args: {
+    method: string;
+    params?: unknown[];
+  }) => Promise<unknown>;
+};
 
 export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
   const router = useRouter();
@@ -46,19 +52,34 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
   const isArcTestnet = chainId === arcPaymentConfig.chainId;
   const arcScanTxUrl = submittedTxHash
     ? `${arcPaymentConfig.blockExplorerUrl}/tx/${submittedTxHash}`
-    : payment.txHash
+    : payment.txHash && payment.executionMode === "arc-testnet"
       ? `${arcPaymentConfig.blockExplorerUrl}/tx/${payment.txHash}`
       : undefined;
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      chainId: arcPaymentConfig.chainId,
-      hash: submittedTxHash,
-      query: {
-        enabled: Boolean(submittedTxHash),
-      },
-    });
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    isError: isConfirmationError,
+    error: confirmationError,
+  } = useWaitForTransactionReceipt({
+    chainId: arcPaymentConfig.chainId,
+    hash: submittedTxHash,
+    query: {
+      enabled: Boolean(submittedTxHash),
+      retry: false,
+    },
+  });
+  const visibleError =
+    error ||
+    (isConfirmationError
+      ? confirmationError?.message ||
+        "Transaction failed or could not be confirmed. Payment status remains unpaid."
+      : "");
 
-  const markPaymentPaid = useCallback(async (txHash: Hex, payerAddress: string) => {
+  const markPaymentPaid = useCallback(async (
+    txHash: Hex,
+    payerAddress: string,
+    executionMode: "simulated" | "arc-testnet",
+  ) => {
     const response = await fetch(`/api/payment-links/${payment.id}`, {
       method: "PATCH",
       headers: {
@@ -66,6 +87,7 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
       },
       body: JSON.stringify({
         status: "paid",
+        executionMode,
         payerAddress,
         txHash,
         paidAt: new Date().toISOString(),
@@ -97,7 +119,7 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
         chain: ARC_NETWORK_PLACEHOLDER,
       });
 
-      await markPaymentPaid(result.txHash, address);
+      await markPaymentPaid(result.txHash, address, "simulated");
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -125,6 +147,12 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
       return;
     }
 
+    const normalizedAmount = Number(payment.amount.replace(",", ""));
+    if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+      setError("Payment amount must be greater than 0 USDC.");
+      return;
+    }
+
     setError("");
     setSubmittedTxHash(undefined);
 
@@ -144,9 +172,10 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
       setSubmittedTxHash(txHash);
     } catch (caughtError) {
       setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Transaction was rejected or failed before submission.",
+        formatWalletError(
+          caughtError,
+          "Transaction was rejected or failed before submission.",
+        ),
       );
     }
   }
@@ -154,12 +183,46 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
   async function handleSwitchToArcTestnet() {
     setError("");
     try {
-      await switchChainAsync({ chainId: arcPaymentConfig.chainId });
+      const ethereum = getEthereumProvider();
+
+      if (!ethereum) {
+        await switchChainAsync({ chainId: arcPaymentConfig.chainId });
+        return;
+      }
+
+      try {
+        await ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: toHexChainId(arcPaymentConfig.chainId) }],
+        });
+      } catch (switchError) {
+        if (!isChainMissingError(switchError)) {
+          throw switchError;
+        }
+
+        await ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: toHexChainId(arcPaymentConfig.chainId),
+              chainName: arcPaymentConfig.networkName,
+              nativeCurrency: {
+                name: "USDC",
+                symbol: arcPaymentConfig.nativeCurrencySymbol,
+                decimals: arcPaymentConfig.nativeCurrencyDecimals,
+              },
+              rpcUrls: [arcPaymentConfig.rpcUrl],
+              blockExplorerUrls: [arcPaymentConfig.blockExplorerUrl],
+            },
+          ],
+        });
+      }
     } catch (caughtError) {
       setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Unable to switch or add Arc Testnet in your wallet.",
+        formatWalletError(
+          caughtError,
+          "Unable to switch or add Arc Testnet in your wallet.",
+        ),
       );
     }
   }
@@ -174,7 +237,7 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
 
       setIsUpdatingAfterReceipt(true);
       try {
-        await markPaymentPaid(submittedTxHash, address);
+        await markPaymentPaid(submittedTxHash, address, "arc-testnet");
         if (isActive) {
           router.push(`/receipt/${payment.id}`);
         }
@@ -230,6 +293,12 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
           ["Asset", payment.asset],
           ["Payer", shortenAddress(payment.payerAddress)],
           ["Status", payment.status],
+          [
+            "Mode",
+            payment.executionMode === "arc-testnet"
+              ? "Arc Testnet"
+              : "Simulated demo",
+          ],
         ].map(([label, value]) => (
           <div
             key={label}
@@ -328,7 +397,7 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
       {paid && payment.txHash ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-400/10">
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-100">
-            {paymentMode === "real"
+            {payment.executionMode === "arc-testnet"
               ? "Arc Testnet payment confirmed"
               : "Simulated payment completed"}
           </p>
@@ -349,9 +418,9 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
         </div>
       ) : null}
 
-      {error ? (
+      {visibleError ? (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100">
-          {error}
+          {visibleError}
         </div>
       ) : null}
 
@@ -398,4 +467,42 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
       </div>
     </div>
   );
+}
+
+function toHexChainId(chainId: number) {
+  return `0x${chainId.toString(16)}`;
+}
+
+function getEthereumProvider() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const maybeWindow = window as typeof window & {
+    ethereum?: EthereumProvider;
+  };
+
+  return maybeWindow.ethereum ?? null;
+}
+
+function isChainMissingError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code: unknown }).code === 4902
+  );
+}
+
+function formatWalletError(error: unknown, fallback: string) {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code: unknown }).code === 4001
+  ) {
+    return "Transaction rejected in wallet. Payment status remains unpaid.";
+  }
+
+  return error instanceof Error ? error.message : fallback;
 }

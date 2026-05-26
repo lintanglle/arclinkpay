@@ -5,8 +5,13 @@ import {
   updatePaymentStatus,
 } from "@/lib/payments/store";
 import type { PaymentStatus } from "@/lib/payments/types";
+import type { PaymentExecutionMode } from "@/lib/payments/types";
 
 const allowedStatuses: PaymentStatus[] = ["unpaid", "paid", "expired"];
+const allowedExecutionModes: PaymentExecutionMode[] = [
+  "simulated",
+  "arc-testnet",
+];
 
 export async function GET(
   _request: Request,
@@ -35,6 +40,9 @@ export async function PATCH(
   const { id } = await context.params;
   const body = await request.json();
   const status = String(body.status) as PaymentStatus;
+  const executionMode = body.executionMode
+    ? (String(body.executionMode) as PaymentExecutionMode)
+    : undefined;
 
   if (!allowedStatuses.includes(status)) {
     return NextResponse.json(
@@ -43,8 +51,16 @@ export async function PATCH(
     );
   }
 
+  if (executionMode && !allowedExecutionModes.includes(executionMode)) {
+    return NextResponse.json(
+      { error: "executionMode must be simulated or arc-testnet" },
+      { status: 400 },
+    );
+  }
+
   const payment = await updatePaymentStatus(id, {
     status,
+    executionMode,
     payerAddress: body.payerAddress ? String(body.payerAddress) : undefined,
     txHash: body.txHash ? String(body.txHash) : undefined,
     paidAt: body.paidAt ? String(body.paidAt) : undefined,

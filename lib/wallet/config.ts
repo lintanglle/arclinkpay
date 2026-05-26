@@ -7,9 +7,9 @@ import { arcPaymentConfig } from "@/lib/arc/config";
 
 export const arcPlaceholderChain = defineChain({
   id: arcPaymentConfig.chainId,
-  name: "Arc",
+  name: arcPaymentConfig.networkName,
   nativeCurrency: {
-    decimals: arcPaymentConfig.usdcDecimals,
+    decimals: arcPaymentConfig.nativeCurrencyDecimals,
     name: "USDC",
     symbol: arcPaymentConfig.nativeCurrencySymbol,
   },

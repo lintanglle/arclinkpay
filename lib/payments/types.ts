@@ -1,4 +1,5 @@
 export type PaymentStatus = "unpaid" | "paid" | "expired";
+export type PaymentExecutionMode = "simulated" | "arc-testnet";
 
 export type PaymentLink = {
   id: string;
@@ -10,6 +11,7 @@ export type PaymentLink = {
   payerAddress?: string;
   note?: string;
   status: PaymentStatus;
+  executionMode?: PaymentExecutionMode;
   txHash?: string;
   createdAt: string;
   createdAtLabel?: string;
@@ -28,6 +30,7 @@ export type CreatePaymentLinkInput = {
 
 export type UpdatePaymentStatusInput = {
   status: PaymentStatus;
+  executionMode?: PaymentExecutionMode;
   payerAddress?: string;
   txHash?: string;
   paidAt?: string;

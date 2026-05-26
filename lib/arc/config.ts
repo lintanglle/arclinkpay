@@ -21,6 +21,7 @@ export const ARC_TESTNET_FAUCET_URL =
 
 export const ARC_NETWORK_NAME = "Arc Testnet";
 export const ARC_NATIVE_CURRENCY_SYMBOL = "USDC";
+export const ARC_NATIVE_CURRENCY_DECIMALS = 18;
 export const ARC_USDC_DECIMALS = 6;
 
 export const arcPaymentConfig = {
@@ -33,4 +34,5 @@ export const arcPaymentConfig = {
   faucetUrl: ARC_TESTNET_FAUCET_URL,
   networkName: ARC_NETWORK_NAME,
   nativeCurrencySymbol: ARC_NATIVE_CURRENCY_SYMBOL,
+  nativeCurrencyDecimals: ARC_NATIVE_CURRENCY_DECIMALS,
 } as const;

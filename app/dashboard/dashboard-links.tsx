@@ -125,6 +125,7 @@ export function DashboardLinks({
                   <th className="px-6 py-4 font-semibold">Title</th>
                   <th className="px-6 py-4 font-semibold">Amount</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
+                  <th className="px-6 py-4 font-semibold">Mode</th>
                   <th className="px-6 py-4 font-semibold">Recipient</th>
                   <th className="px-6 py-4 font-semibold">Created</th>
                   <th className="px-6 py-4 font-semibold">Link</th>
@@ -153,6 +154,11 @@ export function DashboardLinks({
                       >
                         {payment.status}
                       </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
+                      {payment.executionMode === "arc-testnet"
+                        ? "Arc Testnet"
+                        : "Simulated"}
                     </td>
                     <td className="px-6 py-4 font-mono text-xs text-slate-600 dark:text-slate-300">
                       {shortenAddress(payment.recipientAddress)}
@@ -197,6 +203,12 @@ export function DashboardLinks({
                       {payment.amount}
                     </span>{" "}
                     {payment.asset}
+                  </p>
+                  <p>
+                    Mode:{" "}
+                    {payment.executionMode === "arc-testnet"
+                      ? "Arc Testnet"
+                      : "Simulated"}
                   </p>
                   <p className="font-mono text-xs">
                     Recipient: {shortenAddress(payment.recipientAddress)}
