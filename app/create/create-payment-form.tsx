@@ -173,7 +173,7 @@ export function CreatePaymentForm({ dataMode }: { dataMode: DataMode }) {
       {generatedPayment ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-400/10">
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-100">
-            Payment link generated through the API foundation
+            Arc Testnet payment link generated
           </p>
           <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <code className="break-all rounded-lg bg-white px-3 py-2 text-sm text-slate-900 shadow-sm dark:bg-slate-950 dark:text-slate-100">

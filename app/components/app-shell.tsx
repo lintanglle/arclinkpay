@@ -101,8 +101,7 @@ export function WalletRequiredPanel({
         Wallet connection required
       </p>
       <p className="mt-2 text-sm leading-6 text-blue-800 dark:text-blue-100/80">
-        Connect an EVM wallet to use the simulated payment action. This still
-        does not execute a real USDC transfer.
+        Connect an EVM wallet to pay with USDC on Arc Testnet.
       </p>
       <div className="mt-3">{children}</div>
     </div>

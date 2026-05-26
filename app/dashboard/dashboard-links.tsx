@@ -107,6 +107,9 @@ export function DashboardLinks({
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Payment requests loaded through the API foundation.
           </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Payments require a real Arc Testnet wallet transaction.
+          </p>
         </div>
         {data.payments.length === 0 ? (
           <div className="px-5 py-10 text-center sm:px-6">
@@ -125,7 +128,7 @@ export function DashboardLinks({
                   <th className="px-6 py-4 font-semibold">Title</th>
                   <th className="px-6 py-4 font-semibold">Amount</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
-                  <th className="px-6 py-4 font-semibold">Mode</th>
+                  <th className="px-6 py-4 font-semibold">Network</th>
                   <th className="px-6 py-4 font-semibold">Recipient</th>
                   <th className="px-6 py-4 font-semibold">Created</th>
                   <th className="px-6 py-4 font-semibold">Link</th>
@@ -156,9 +159,9 @@ export function DashboardLinks({
                       </Badge>
                     </td>
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
-                      {payment.executionMode === "arc-testnet"
-                        ? "Arc Testnet"
-                        : "Simulated"}
+                      {payment.executionMode === "simulated"
+                        ? "Legacy demo"
+                        : payment.network}
                     </td>
                     <td className="px-6 py-4 font-mono text-xs text-slate-600 dark:text-slate-300">
                       {shortenAddress(payment.recipientAddress)}
@@ -205,10 +208,10 @@ export function DashboardLinks({
                     {payment.asset}
                   </p>
                   <p>
-                    Mode:{" "}
-                    {payment.executionMode === "arc-testnet"
-                      ? "Arc Testnet"
-                      : "Simulated"}
+                    Network:{" "}
+                    {payment.executionMode === "simulated"
+                      ? "Legacy demo"
+                      : payment.network}
                   </p>
                   <p className="font-mono text-xs">
                     Recipient: {shortenAddress(payment.recipientAddress)}

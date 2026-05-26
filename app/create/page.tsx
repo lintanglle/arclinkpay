@@ -15,8 +15,8 @@ export default function CreatePage() {
           </h1>
           <p className="text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg sm:leading-8">
             Enter the payment details a payer should see before sending USDC on
-            Arc. This creates a payment link through the API foundation while
-            settlement remains simulated.
+            Arc Testnet. Payment completion requires a real Arc Testnet wallet
+            transaction.
           </p>
         </div>
         <Card>

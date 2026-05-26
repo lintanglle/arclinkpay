@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Address, Hex } from "viem";
 import { isAddress } from "viem";
 import {
@@ -13,12 +13,7 @@ import {
 } from "wagmi";
 import { arcPaymentConfig } from "@/lib/arc/config";
 import { shortenAddress } from "@/lib/payments/format";
-import {
-  ARC_NETWORK_PLACEHOLDER,
-  ARC_USDC_TOKEN_PLACEHOLDER,
-  prepareArcUsdcTransfer,
-  simulateArcUsdcPayment,
-} from "@/lib/payments/payment-executor";
+import { prepareArcUsdcTransfer } from "@/lib/payments/payment-executor";
 import type { PaymentLink } from "@/lib/payments/types";
 import {
   Badge,
@@ -28,7 +23,6 @@ import {
 } from "../../components/app-shell";
 import { WalletButton } from "../../components/wallet-button";
 
-type PaymentMode = "simulated" | "real";
 type EthereumProvider = {
   request: (args: {
     method: string;
@@ -43,13 +37,15 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
   const { writeContractAsync, isPending: isSubmittingTransaction } =
     useWriteContract();
   const [payment, setPayment] = useState(initialPayment);
-  const [paymentMode, setPaymentMode] = useState<PaymentMode>("simulated");
-  const [isPaying, setIsPaying] = useState(false);
   const [isUpdatingAfterReceipt, setIsUpdatingAfterReceipt] = useState(false);
   const [submittedTxHash, setSubmittedTxHash] = useState<Hex>();
   const [error, setError] = useState("");
+  const [networkDebug, setNetworkDebug] = useState("");
   const paid = payment.status === "paid";
   const isArcTestnet = chainId === arcPaymentConfig.chainId;
+  const validRecipient = isAddress(payment.recipientAddress);
+  const normalizedAmount = Number(payment.amount.replace(",", ""));
+  const validAmount = Number.isFinite(normalizedAmount) && normalizedAmount > 0;
   const arcScanTxUrl = submittedTxHash
     ? `${arcPaymentConfig.blockExplorerUrl}/tx/${submittedTxHash}`
     : payment.txHash && payment.executionMode === "arc-testnet"
@@ -68,6 +64,25 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
       retry: false,
     },
   });
+  const requirementMessage = useMemo(() => {
+    if (!isConnected) {
+      return "Connect a wallet to pay with USDC on Arc Testnet.";
+    }
+
+    if (!isArcTestnet) {
+      return "Switch your wallet to Arc Testnet before paying.";
+    }
+
+    if (!validRecipient) {
+      return "Recipient address is not a valid EVM address.";
+    }
+
+    if (!validAmount) {
+      return "Payment amount must be greater than 0 USDC.";
+    }
+
+    return "";
+  }, [isArcTestnet, isConnected, validAmount, validRecipient]);
   const visibleError =
     error ||
     (isConfirmationError
@@ -75,81 +90,35 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
         "Transaction failed or could not be confirmed. Payment status remains unpaid."
       : "");
 
-  const markPaymentPaid = useCallback(async (
-    txHash: Hex,
-    payerAddress: string,
-    executionMode: "simulated" | "arc-testnet",
-  ) => {
-    const response = await fetch(`/api/payment-links/${payment.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        status: "paid",
-        executionMode,
-        payerAddress,
-        txHash,
-        paidAt: new Date().toISOString(),
-      }),
-    });
-    const payload = await response.json();
-
-    if (!response.ok) {
-      throw new Error(payload.error || "Unable to update payment status.");
-    }
-
-    setPayment(payload.payment);
-  }, [payment.id]);
-
-  async function handleSimulatedPayment() {
-    if (!isConnected || !address) {
-      setError("Connect a wallet before simulating payment.");
-      return;
-    }
-
-    setError("");
-    setIsPaying(true);
-
-    try {
-      const result = await simulateArcUsdcPayment({
-        recipientAddress: payment.recipientAddress,
-        amount: payment.amount,
-        tokenAddress: ARC_USDC_TOKEN_PLACEHOLDER,
-        chain: ARC_NETWORK_PLACEHOLDER,
+  const markPaymentPaid = useCallback(
+    async (txHash: Hex, payerAddress: string) => {
+      const response = await fetch(`/api/payment-links/${payment.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: "paid",
+          executionMode: "arc-testnet",
+          payerAddress,
+          txHash,
+          paidAt: new Date().toISOString(),
+        }),
       });
+      const payload = await response.json();
 
-      await markPaymentPaid(result.txHash, address, "simulated");
-    } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Unable to simulate payment.",
-      );
-    } finally {
-      setIsPaying(false);
-    }
-  }
+      if (!response.ok) {
+        throw new Error(payload.error || "Unable to update payment status.");
+      }
+
+      setPayment(payload.payment);
+    },
+    [payment.id],
+  );
 
   async function handleRealPayment() {
-    if (!isConnected || !address) {
-      setError("Connect a wallet before paying on Arc Testnet.");
-      return;
-    }
-
-    if (!isArcTestnet) {
-      setError("Switch to Arc Testnet before sending a real testnet payment.");
-      return;
-    }
-
-    if (!isAddress(payment.recipientAddress)) {
-      setError("Recipient address is not a valid EVM address.");
-      return;
-    }
-
-    const normalizedAmount = Number(payment.amount.replace(",", ""));
-    if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
-      setError("Payment amount must be greater than 0 USDC.");
+    if (!isConnected || !address || !isArcTestnet || !validRecipient || !validAmount) {
+      setError(requirementMessage || "Payment requirements are not met.");
       return;
     }
 
@@ -182,6 +151,8 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
 
   async function handleSwitchToArcTestnet() {
     setError("");
+    setNetworkDebug("");
+
     try {
       const ethereum = getEthereumProvider();
 
@@ -218,6 +189,7 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
         });
       }
     } catch (caughtError) {
+      setNetworkDebug(formatRawWalletError(caughtError));
       setError(
         formatWalletError(
           caughtError,
@@ -237,7 +209,7 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
 
       setIsUpdatingAfterReceipt(true);
       try {
-        await markPaymentPaid(submittedTxHash, address, "arc-testnet");
+        await markPaymentPaid(submittedTxHash, address);
         if (isActive) {
           router.push(`/receipt/${payment.id}`);
         }
@@ -293,12 +265,6 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
           ["Asset", payment.asset],
           ["Payer", shortenAddress(payment.payerAddress)],
           ["Status", payment.status],
-          [
-            "Mode",
-            payment.executionMode === "arc-testnet"
-              ? "Arc Testnet"
-              : "Simulated demo",
-          ],
         ].map(([label, value]) => (
           <div
             key={label}
@@ -318,59 +284,34 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
         </WalletRequiredPanel>
       ) : null}
 
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5">
-        <p className="text-sm font-semibold text-slate-950 dark:text-white">
-          Payment mode
-        </p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => setPaymentMode("simulated")}
-            className={`rounded-lg border px-4 py-3 text-left text-sm font-semibold transition ${
-              paymentMode === "simulated"
-                ? "border-blue-500 bg-blue-50 text-blue-900 dark:border-blue-300 dark:bg-blue-400/10 dark:text-blue-100"
-                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-slate-950/20 dark:text-slate-200 dark:hover:bg-white/10"
-            }`}
-          >
-            Simulated demo
-            <span className="mt-1 block text-xs font-normal">
-              Safe fallback. No wallet transaction is sent.
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setPaymentMode("real")}
-            className={`rounded-lg border px-4 py-3 text-left text-sm font-semibold transition ${
-              paymentMode === "real"
-                ? "border-emerald-500 bg-emerald-50 text-emerald-900 dark:border-emerald-300 dark:bg-emerald-400/10 dark:text-emerald-100"
-                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-slate-950/20 dark:text-slate-200 dark:hover:bg-white/10"
-            }`}
-          >
-            Real Arc Testnet
-            <span className="mt-1 block text-xs font-normal">
-              Sends USDC on Arc Testnet only.
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {paymentMode === "real" && isConnected && !isArcTestnet ? (
+      {requirementMessage ? (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-400/20 dark:bg-amber-400/10">
           <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-            Wrong network
+            Payment requirement
           </p>
           <p className="mt-2 text-sm leading-6 text-amber-800 dark:text-amber-100/80">
-            Switch your wallet to Arc Testnet before sending a real testnet USDC
-            payment.
+            {requirementMessage}
           </p>
-          <button
-            type="button"
-            onClick={handleSwitchToArcTestnet}
-            disabled={isSwitchingChain}
-            className={`${secondaryButton} mt-3 disabled:cursor-not-allowed disabled:opacity-60`}
-          >
-            {isSwitchingChain ? "Switching..." : "Switch to Arc Testnet"}
-          </button>
+          {isConnected && !isArcTestnet ? (
+            <button
+              type="button"
+              onClick={handleSwitchToArcTestnet}
+              disabled={isSwitchingChain}
+              className={`${secondaryButton} mt-3 disabled:cursor-not-allowed disabled:opacity-60`}
+            >
+              {isSwitchingChain ? "Switching..." : "Switch to Arc Testnet"}
+            </button>
+          ) : null}
+          {networkDebug ? (
+            <details className="mt-3 text-xs text-amber-900 dark:text-amber-100">
+              <summary className="cursor-pointer font-semibold">
+                Wallet error details
+              </summary>
+              <pre className="mt-2 whitespace-pre-wrap break-words rounded-lg bg-white/70 p-3 dark:bg-black/20">
+                {networkDebug}
+              </pre>
+            </details>
+          ) : null}
         </div>
       ) : null}
 
@@ -394,27 +335,19 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
         </div>
       ) : null}
 
-      {paid && payment.txHash ? (
+      {paid && payment.txHash && payment.executionMode === "arc-testnet" ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-400/10">
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-100">
-            {payment.executionMode === "arc-testnet"
-              ? "Arc Testnet payment confirmed"
-              : "Simulated payment completed"}
+            Arc Testnet payment confirmed
           </p>
-          {arcScanTxUrl ? (
-            <a
-              href={arcScanTxUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 block break-all font-mono text-sm text-emerald-900 underline underline-offset-4 dark:text-emerald-50"
-            >
-              {payment.txHash}
-            </a>
-          ) : (
-            <code className="mt-2 block break-all text-sm text-emerald-900 dark:text-emerald-50">
-              {payment.txHash}
-            </code>
-          )}
+          <a
+            href={arcScanTxUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 block break-all font-mono text-sm text-emerald-900 underline underline-offset-4 dark:text-emerald-50"
+          >
+            {payment.txHash}
+          </a>
         </div>
       ) : null}
 
@@ -425,42 +358,26 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
       ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        {paymentMode === "simulated" ? (
-          <button
-            type="button"
-            onClick={handleSimulatedPayment}
-            disabled={!isConnected || paid || isPaying}
-            className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-60`}
-          >
-            {paid
-              ? "Payment completed"
-              : isPaying
-                ? "Simulating..."
-                : "Simulate USDC payment"}
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleRealPayment}
-            disabled={
-              !isConnected ||
-              !isArcTestnet ||
-              paid ||
-              isSubmittingTransaction ||
-              isConfirming ||
-              isUpdatingAfterReceipt
-            }
-            className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-60`}
-          >
-            {paid
-              ? "Payment completed"
-              : isSubmittingTransaction
-                ? "Submitting..."
-                : isConfirming || isUpdatingAfterReceipt
-                  ? "Confirming..."
-                  : "Pay on Arc Testnet"}
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleRealPayment}
+          disabled={
+            Boolean(requirementMessage) ||
+            paid ||
+            isSubmittingTransaction ||
+            isConfirming ||
+            isUpdatingAfterReceipt
+          }
+          className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-60`}
+        >
+          {paid
+            ? "Payment completed"
+            : isSubmittingTransaction
+              ? "Submitting..."
+              : isConfirming || isUpdatingAfterReceipt
+                ? "Confirming..."
+                : "Pay on Arc Testnet"}
+        </button>
         <Link href={`/receipt/${payment.id}`} className={secondaryButton}>
           View receipt
         </Link>
@@ -505,4 +422,16 @@ function formatWalletError(error: unknown, fallback: string) {
   }
 
   return error instanceof Error ? error.message : fallback;
+}
+
+function formatRawWalletError(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  try {
+    return JSON.stringify(error, null, 2);
+  } catch {
+    return String(error);
+  }
 }

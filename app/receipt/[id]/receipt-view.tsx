@@ -88,6 +88,7 @@ export function ReceiptView({ id }: { id: string }) {
 
   const payment = payload.payment;
   const isArcTestnetReceipt = payment.executionMode === "arc-testnet";
+  const isLegacyDemoReceipt = payment.executionMode === "simulated";
   const arcScanTxUrl =
     isArcTestnetReceipt && payment.txHash
       ? `https://testnet.arcscan.app/tx/${payment.txHash}`
@@ -95,7 +96,10 @@ export function ReceiptView({ id }: { id: string }) {
   const rows = [
     ["Amount", `${payment.amount} ${payment.asset}`],
     ["Network", payment.network],
-    ["Receipt type", isArcTestnetReceipt ? "Arc Testnet receipt" : "Simulated receipt"],
+    [
+      "Receipt type",
+      isArcTestnetReceipt ? "Arc Testnet receipt" : "Legacy demo receipt",
+    ],
     ["Payer address", shortenAddress(payment.payerAddress)],
     ["Recipient address", shortenAddress(payment.recipientAddress)],
     ["Created", formatPaymentDate(payment.createdAt, payment.createdAtLabel)],
@@ -117,7 +121,7 @@ export function ReceiptView({ id }: { id: string }) {
                 {payment.status === "paid" ? "Paid receipt" : "Receipt pending"}
               </Badge>
               <h1 className="mt-4 text-2xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-3xl">
-                {isArcTestnetReceipt ? "Arc Testnet receipt" : "Simulated receipt"}
+                {isArcTestnetReceipt ? "Arc Testnet receipt" : "Legacy demo receipt"}
               </h1>
               <p className="mt-1 font-medium text-slate-950 dark:text-white">
                 {payment.title}
@@ -126,8 +130,8 @@ export function ReceiptView({ id }: { id: string }) {
                 {payment.status === "paid"
                   ? isArcTestnetReceipt
                     ? "USDC payment confirmed on Arc Testnet."
-                    : "Demo payment completed without an onchain transfer."
-                  : "Payment has not been simulated yet."}
+                    : "Legacy demo record. This is not an onchain receipt."
+                  : "Payment has not been completed on Arc Testnet yet."}
               </p>
             </div>
             <div className="sm:text-right">
@@ -170,7 +174,7 @@ export function ReceiptView({ id }: { id: string }) {
             ) : (
               <p className="mt-2 break-all font-medium text-slate-950 dark:text-white">
                 {payment.txHash
-                  ? `${payment.txHash} (simulated, not onchain)`
+                  ? `${payment.txHash} (${isLegacyDemoReceipt ? "legacy demo, not onchain" : "not onchain"})`
                   : "Not available yet"}
               </p>
             )}
