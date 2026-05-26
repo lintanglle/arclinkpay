@@ -9,20 +9,20 @@ import {
 
 const features = [
   {
-    title: "Create payment links",
-    body: "Generate a clean Arc payment page for invoices, grants, bounties, or one-off requests.",
+    title: "Create Arc Testnet links",
+    body: "Generate a clear payment request for grants, bounties, services, or one-off USDC payments.",
   },
   {
-    title: "Get paid in USDC",
-    body: "Keep settlement simple with one familiar stablecoin and recipient wallet details upfront.",
+    title: "Receive testnet USDC",
+    body: "Show the amount, asset, recipient, and network before the payer confirms a wallet transaction.",
   },
   {
     title: "Track payment status",
     body: "See which links are paid, unpaid, and ready for follow-up from a lightweight dashboard.",
   },
   {
-    title: "View onchain receipts",
-    body: "Share receipt pages with transaction hashes, timestamps, parties, and payment metadata.",
+    title: "Verify on ArcScan",
+    body: "Review receipt pages with transaction hashes, timestamps, parties, and ArcScan links.",
   },
 ];
 
@@ -32,7 +32,7 @@ export default function Home() {
       <section className="grid items-center gap-8 py-2 sm:gap-10 lg:grid-cols-[1.04fr_0.96fr] lg:py-8">
         <div className="space-y-7">
           <div className="inline-flex rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800 shadow-sm dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-100">
-            Built for Arc and USDC
+            Arc Testnet USDC payment links
           </div>
           <div className="space-y-5">
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-normal text-slate-950 dark:text-white sm:text-6xl">
@@ -43,9 +43,9 @@ export default function Home() {
             </p>
             <p className="max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg sm:leading-8">
               Create a payment request, send the link, and give payers a clear
-              checkout-style page with amount, asset, network, and receipt
-              details. This MVP uses mock data so the core flow is demo-ready
-              without wallet or blockchain integrations.
+              checkout-style page with amount, asset, network, and recipient
+              details. ArcLinkPay currently supports Arc Testnet payments;
+              mainnet and production payments are planned for a later milestone.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -70,15 +70,15 @@ export default function Home() {
                 1,250.00 <span className="text-2xl text-slate-300">USDC</span>
               </p>
               <p className="mt-3 text-sm leading-6 text-slate-400">
-                Arc grant milestone payment, ready to share with a payer.
+                Arc Testnet payment request, ready to share with a payer.
               </p>
             </div>
           </div>
           <div className="space-y-3 p-5 sm:p-6">
             {[
-              ["Network", "Arc"],
+              ["Network", "Arc Testnet"],
               ["Recipient", "0x8f4a...91c2"],
-              ["Link", "arclinkpay.app/pay/demo-payment"],
+              ["Link", "arclinkpay.app/pay/payment-id"],
             ].map(([label, value]) => (
               <div
                 key={label}

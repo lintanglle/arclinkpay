@@ -62,12 +62,12 @@ export function PayRequest({ id }: { id: string }) {
             This payment link was not found
           </h1>
           <p className="mx-auto max-w-md leading-7 text-slate-600 dark:text-slate-300">
-            Use the demo payment link or create a new request to preview the
-            payer experience.
+            Create a new Arc Testnet request or open a sample record from the
+            fallback data.
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <Link href="/pay/demo-payment" className={secondaryButton}>
-              Open demo payment
+              Open sample link
             </Link>
             <Link href="/create" className={secondaryButton}>
               Create link

@@ -14,8 +14,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ArcLinkPay",
-  description: "USDC payments on Arc, as simple as sharing a link.",
+  metadataBase: new URL("https://arclinkpay.vercel.app"),
+  title: "ArcLinkPay - USDC Payment Links on Arc Testnet",
+  description:
+    "Create USDC payment requests, share payment links, and track receipts on Arc Testnet.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon", type: "image/png" }],
+  },
+  openGraph: {
+    title: "ArcLinkPay - USDC Payment Links on Arc Testnet",
+    description:
+      "Create USDC payment requests, share payment links, and track receipts on Arc Testnet.",
+    url: "https://arclinkpay.vercel.app",
+    siteName: "ArcLinkPay",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "ArcLinkPay - USDC Payment Links on Arc Testnet",
+    description:
+      "Create USDC payment requests, share payment links, and track receipts on Arc Testnet.",
+  },
 };
 
 export default function RootLayout({

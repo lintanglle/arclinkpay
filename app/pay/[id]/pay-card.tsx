@@ -284,6 +284,12 @@ export function PayCard({ initialPayment }: { initialPayment: PaymentLink }) {
         </WalletRequiredPanel>
       ) : null}
 
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+        To complete this payment, connect a wallet, use Arc Testnet, and make
+        sure the payer wallet has enough Arc Testnet USDC for the transfer and
+        gas.
+      </div>
+
       {requirementMessage ? (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-400/20 dark:bg-amber-400/10">
           <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">

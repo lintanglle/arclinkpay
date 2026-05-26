@@ -14,8 +14,8 @@ export default function DashboardPage() {
             Payment links
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg sm:leading-8">
-            Monitor Arc USDC requests and status through an API-backed
-            foundation. Payments are still simulated in this milestone.
+            Monitor Arc Testnet USDC payment requests, transaction status, and
+            receipt links through the API-backed foundation.
           </p>
         </div>
         <Link href="/create" className={primaryButton}>

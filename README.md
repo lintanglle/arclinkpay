@@ -4,87 +4,108 @@ USDC payments on Arc, as simple as sharing a link.
 
 Live demo: [https://arclinkpay.vercel.app](https://arclinkpay.vercel.app)
 
+GitHub: [this repository](.)
+
 ## What ArcLinkPay Is
 
-ArcLinkPay is a simple USDC payment link platform built for Arc. It is designed to help users create payment requests, share a link with a payer, receive USDC, and track payment status with a clear receipt.
+ArcLinkPay is a USDC payment-link product for Arc Testnet. It lets a recipient create a payment request, share a link, receive a wallet-based Arc Testnet USDC payment, and track the result with a clear receipt.
 
-The current version is an integration-ready MVP foundation. It includes wallet connection UI, payment link API routes, a database-ready payment link model, mock fallback storage, and Arc Testnet USDC payment execution.
+The current milestone is an integration-ready MVP foundation. It includes wallet connection, payment link APIs, a database-ready payment model, Supabase-ready structure, Arc Testnet configuration, and real Arc Testnet USDC transfer execution.
 
-## Current Milestone
-
-ArcLinkPay is no longer only a static frontend mock. This milestone adds the foundation needed for future production integrations:
-
-- Wallet connection UI and EVM wallet foundation
-- Payment link create, read, list, and status update API routes
-- Database-ready payment link data model
-- Supabase-ready client/server structure with mock fallback when env vars are missing
-- Arc Testnet USDC payment execution using the connected wallet
-
-Real Arc Testnet USDC execution is available in the public payment flow. Production or mainnet payments are not live.
+ArcLinkPay does not support mainnet or production payments yet.
 
 ## Problem
 
-Crypto payments are still too manual for many everyday payment requests. A payer often needs to copy wallet addresses, confirm the correct network, understand the requested asset, and separately share transaction details after payment.
+Simple USDC payment requests still require too many manual steps: copying addresses, confirming the network, checking the asset, sharing transaction hashes, and tracking whether a payment has actually been completed.
 
-For builders, grant recipients, freelancers, communities, and small teams, this creates avoidable friction around simple USDC payment requests.
+This is especially painful for builders, grant recipients, freelancers, communities, and small teams that need a lightweight payment request flow.
 
 ## Solution
 
 ArcLinkPay turns a payment request into a shareable link.
 
-A recipient can create a request with a title, amount, recipient wallet address, note, and optional expiry date. The payer receives a clear payment page showing the amount, network, asset, recipient, and status. After payment, the flow provides a receipt-style page with transaction details.
+The recipient enters a title, amount, recipient wallet address, note, and optional expiry date. The payer opens the link, connects a wallet, switches to Arc Testnet if needed, sends USDC through the configured ERC-20 interface, and receives a receipt with transaction details and an ArcScan link.
+
+## Current Status
+
+ArcLinkPay is ready to demonstrate as an integration-ready MVP foundation.
+
+Built now:
+
+- Public landing page
+- Create payment link flow
+- Public payment page at `/pay/[id]`
+- Receipt page at `/receipt/[id]`
+- Dashboard for payment links and statuses
+- Wallet connection UI
+- Arc Testnet network handling
+- Real Arc Testnet USDC ERC-20 transfer execution
+- Transaction hash display and ArcScan links
+- API routes for create, read, list, and status updates
+- Database-ready payment link model
+- Supabase-ready client/server structure
+- Mock fallback data when no database is configured
+
+Not live yet:
+
+- Mainnet payments
+- Production settlement
+- Required Supabase persistence
+- Full receipt verification from indexed onchain data
 
 ## MVP Features
 
-- Landing page for the product and core value proposition
-- Create payment link page backed by the API foundation
-- Public payment page at `/pay/[id]`
-- Wallet connection foundation using a common EVM wallet stack
-- Real Arc Testnet USDC payment flow
-- Receipt page at `/receipt/[id]`
-- Dashboard loaded through the payment link API foundation
-- Database-ready payment link model for future persistence
-- Supabase-ready client/server setup with mock fallback when env vars are missing
-- Arc USDC execution preparation layer for future wallet transactions
-- Dark-mode friendly, responsive UI
-- Safe fallback UI for unknown payment and receipt IDs
+- Create USDC payment requests for Arc Testnet
+- Share a payment link with a payer
+- Require wallet connection before payment
+- Detect and switch/add Arc Testnet in the payer wallet
+- Send Arc Testnet USDC using the ERC-20 interface
+- Track unpaid and paid statuses through the API foundation
+- Show paid receipts with payer, recipient, amount, timestamp, transaction hash, and ArcScan link
+- Keep the app deploy-safe without environment variables through fallback data
 
 ## Demo Flow
 
-1. Visit the live demo.
-2. Open **Create payment link**.
-3. Fill in a mock title, amount, recipient address, note, and optional expiry date.
-4. Generate the mock payment link.
-5. Open the public payment page.
-6. Connect an EVM wallet.
-7. Make sure the payer wallet is connected to Arc Testnet and has Arc Testnet USDC from the faucet.
-8. Submit the USDC ERC-20 transfer and wait for confirmation.
-9. View the receipt page.
-10. Open the dashboard to review payment links and statuses.
+1. Open the live demo.
+2. Create a payment link.
+3. Share or open the generated `/pay/[id]` link.
+4. Connect an EVM wallet.
+5. Switch to Arc Testnet if prompted.
+6. Make sure the payer wallet has Arc Testnet USDC from the faucet.
+7. Submit the USDC transfer.
+8. Confirm the transaction in the wallet.
+9. Open the receipt and verify the transaction on ArcScan.
+10. Review the link status in the dashboard.
 
 ## How Arc Is Used
 
-ArcLinkPay is designed around Arc as the target payment network. The MVP UI already presents Arc as the payment network on payment and receipt screens so the user flow is clear before protocol integration.
+ArcLinkPay uses Arc Testnet as the payment network for this milestone.
 
-This milestone adds wallet-based Arc Testnet payment execution. Real production/mainnet settlement is planned later.
+Current Arc Testnet configuration:
 
-The onchain layer targets Arc Testnet configuration: chain ID `5042002`, RPC `https://rpc.testnet.arc.network`, WebSocket `wss://rpc.testnet.arc.network`, block explorer `https://testnet.arcscan.app`, faucet `https://faucet.circle.com`, and USDC ERC-20 interface address `0x3600000000000000000000000000000000000000`.
+- Network name: `Arc Testnet`
+- Chain ID: `5042002`
+- RPC URL: `https://rpc.testnet.arc.network`
+- WebSocket URL: `wss://rpc.testnet.arc.network`
+- Block explorer: `https://testnet.arcscan.app`
+- Faucet: `https://faucet.circle.com`
+- USDC ERC-20 interface: `0x3600000000000000000000000000000000000000`
 
-Arc uses USDC as the native gas token. For app-level USDC balance reads and payment transfers, ArcLinkPay uses the USDC ERC-20 interface with 6 decimals. Real testnet transaction hashes link to ArcScan for verification.
+Arc uses USDC as the native gas token. For app-level USDC balance reads and payment transfers, ArcLinkPay uses the configured USDC ERC-20 interface with 6 decimals.
 
 ## How USDC Is Used
 
-USDC is the payment asset for ArcLinkPay requests. On Arc Testnet, USDC is also the native gas token, while the configured ERC-20 interface address is used for app-level payment transfers. The MVP supports real Arc Testnet USDC transfers.
+USDC is the requested payment asset. On Arc Testnet, the payer sends USDC from their connected wallet to the recipient wallet address in the payment request.
 
-Production or mainnet USDC transfers are not enabled yet. To test real Arc Testnet payments, users need Arc Testnet USDC from [Circle's faucet](https://faucet.circle.com).
+Users need Arc Testnet USDC from [Circle's faucet](https://faucet.circle.com) to test real payments. Production or mainnet USDC payments are not live.
 
 ## Target Users
 
 - Arc ecosystem builders accepting grants, bounties, or service payments
 - Freelancers and small teams requesting stablecoin payments
 - Community operators paying contributors in USDC
-- Hackathon teams and early projects that need a simple payment request flow
-- Reviewers and partners evaluating an Arc payment-link experience
+- Hackathon teams building around Arc
+- Grant reviewers evaluating an Arc payment-link workflow
 
 ## Tech Stack
 
@@ -95,38 +116,12 @@ Production or mainnet USDC transfers are not enabled yet. To test real Arc Testn
 - Wagmi
 - Viem
 - TanStack Query
-- Supabase-ready client structure
+- Supabase-ready client/server structure
 - Vercel deployment target
-- In-memory/mock fallback data for the current MVP
-
-## Roadmap
-
-- Frontend MVP with mock payment data fallback
-- Wallet connection foundation for payers and recipients
-- API route foundation for create, read, list, and status updates
-- Supabase-ready payment link model
-- Replace in-memory fallback with Supabase persistence when credentials are configured
-- Harden Arc Testnet execution and receipt verification
-- Production-ready Arc USDC settlement
-- Transaction status detection
-- Real receipt generation from transaction data
-- Payment link persistence
-- Basic recipient dashboard and link management
-- Optional expiry handling and payment metadata
-
-## Current Status
-
-ArcLinkPay is currently an integration-ready MVP foundation.
-
-The app is ready to demonstrate the product direction, core screens, wallet connection foundation, payment link API/data foundation, Supabase-ready structure, and Arc Testnet payment execution. It does not support production or mainnet payments.
-
-## Disclaimer
-
-This project does not process production payments. Real payment execution is limited to Arc Testnet and should be treated as testnet-only infrastructure. Mock fallback data may appear when no database is configured, but public payment completion requires a real Arc Testnet wallet transaction.
 
 ## Environment Variables
 
-ArcLinkPay runs without environment variables by falling back to in-memory demo data.
+ArcLinkPay runs without environment variables by using fallback data.
 
 Future Supabase persistence can use:
 
@@ -136,7 +131,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-Arc Testnet network configuration defaults:
+Arc Testnet values are configured in the app and can be mirrored with:
 
 ```bash
 NEXT_PUBLIC_ARC_CHAIN_ID=5042002
@@ -146,6 +141,14 @@ NEXT_PUBLIC_ARC_USDC_TOKEN_ADDRESS=0x3600000000000000000000000000000000000000
 NEXT_PUBLIC_ARC_BLOCK_EXPLORER_URL=https://testnet.arcscan.app
 NEXT_PUBLIC_ARC_FAUCET_URL=https://faucet.circle.com
 ```
+
+## Roadmap
+
+- Replace in-memory fallback storage with Supabase persistence
+- Add stronger transaction confirmation and receipt reconciliation
+- Add recipient dashboard filtering and link management
+- Add expiry handling and payment metadata improvements
+- Prepare for production settlement when Arc mainnet support is ready
 
 ## Local Development
 
@@ -161,7 +164,7 @@ Run the development server:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
 Run checks:
 
@@ -169,3 +172,7 @@ Run checks:
 npm run lint
 npm run build
 ```
+
+## Disclaimer
+
+ArcLinkPay currently supports Arc Testnet payments only. Mainnet and production payments are not live. Fallback records may appear when no database is configured, but public payment completion requires a wallet transaction on Arc Testnet.

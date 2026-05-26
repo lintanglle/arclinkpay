@@ -68,12 +68,12 @@ export function ReceiptView({ id }: { id: string }) {
                 This receipt was not found
               </h1>
               <p className="mx-auto max-w-md leading-7 text-slate-600 dark:text-slate-300">
-                Open the demo receipt or return to the dashboard to view the
-                current payment links.
+                Return to the dashboard to view current payment links, or open
+                a sample fallback receipt.
               </p>
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
                 <Link href="/receipt/demo-payment" className={secondaryButton}>
-                  Open demo receipt
+                  Open sample receipt
                 </Link>
                 <Link href="/dashboard" className={secondaryButton}>
                   Dashboard

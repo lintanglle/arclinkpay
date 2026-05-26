@@ -14,7 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="relative border-b border-slate-200/80 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/70">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <Link href="/" className="flex items-center gap-3 font-semibold">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-950 text-sm text-white shadow-sm dark:bg-white dark:text-slate-950">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#07162f] text-sm text-white shadow-sm ring-1 ring-cyan-300/30 dark:bg-[#07162f] dark:text-white">
               AL
             </span>
             <span className="text-base">ArcLinkPay</span>

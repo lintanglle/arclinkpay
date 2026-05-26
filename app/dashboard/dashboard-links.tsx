@@ -85,6 +85,10 @@ export function DashboardLinks({
           Demo data shown because no database is configured.
         </p>
       ) : null}
+      <p className="mt-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-100">
+        ArcLinkPay currently supports Arc Testnet payments. Mainnet support is
+        planned for a later milestone.
+      </p>
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
@@ -105,7 +109,7 @@ export function DashboardLinks({
             Recent links
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Payment requests loaded through the API foundation.
+            Payment requests loaded through the API foundation on Arc Testnet.
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Payments require a real Arc Testnet wallet transaction.
